@@ -1,0 +1,1 @@
+import type{Priority}from'../types';export function vibrate(priority:Priority,enabled=true){if(!enabled||!navigator.vibrate)return;const pattern=priority==='high'?[180,80,180,80,260]:priority==='medium'?[100,70,100]:[70];navigator.vibrate(pattern)}

@@ -1,0 +1,2 @@
+import type{Detection}from'../types';
+export class AnnouncementGate{private seen=new Map<string,number>();constructor(private cooldownMs:number){}setCooldown(ms:number){this.cooldownMs=ms}key(d:Detection){return`${d.label}:${d.direction}:${d.proximity}`}shouldAnnounce(d:Detection,now=Date.now()){const key=this.key(d),last=this.seen.get(key)??-Infinity;if(now-last<this.cooldownMs)return false;this.seen.set(key,now);return true}reset(){this.seen.clear()}}

@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: qraft-vision
+    runtime: static
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    headers:
+      - path: /*
+        name: Permissions-Policy
+        value: camera=(self), microphone=()
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
