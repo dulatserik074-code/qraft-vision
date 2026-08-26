@@ -1,4 +1,4 @@
-<!doctype html><html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#07130d"><title>Qraft Vision — говорящая камера</title><link rel="stylesheet" href="/src/style.css"></head><body>
+<!doctype html><html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#07130d"><title>Qraft Vision — говорящая камера</title><link rel="stylesheet" href="/src/style.css"><link rel="stylesheet" href="/src/ai.css"></head><body>
 <a class="skip-link" href="#actions">К основным действиям</a><main class="app" aria-labelledby="app-title">
 <header class="header"><div><p class="kicker">Talking Camera</p><h1 id="app-title">Qraft Vision</h1></div><button id="settingsButton" class="icon-button" type="button" aria-label="Открыть настройки" aria-expanded="false" aria-controls="settingsPanel">⚙<span>Настройки</span></button></header>
 <p class="disclaimer" role="note">Экспериментальная функция. Не заменяет трость, собаку-проводника или другие средства безопасной навигации.</p>
@@ -6,8 +6,10 @@
 <div id="status" class="status" role="status" aria-live="polite">Готово к запуску</div><div id="urgentStatus" class="sr-only" role="alert" aria-live="assertive"></div>
 <section id="actions" class="actions" aria-label="Основные действия">
 <button id="cameraButton" class="action action-primary" type="button"><span aria-hidden="true">◉</span><span><strong>Запустить камеру</strong><small>Начать распознавание</small></span></button>
+<button id="stopButton" class="action" type="button" disabled><span aria-hidden="true">■</span><span><strong>Остановить</strong><small>Выключить камеру и анализ</small></span></button>
 <button id="describeButton" class="action" type="button" disabled><span aria-hidden="true">◎</span><span><strong>Что передо мной?</strong><small>Описать текущую сцену</small></span></button>
 <button id="ocrButton" class="action" type="button" disabled><span aria-hidden="true">Aa</span><span><strong>Прочитать текст</strong><small>Распознать русский текст</small></span></button>
+<button id="repeatActionButton" class="action" type="button"><span aria-hidden="true">↻</span><span><strong>Повторить</strong><small>Последнее голосовое сообщение</small></span></button>
 <button id="obstacleButton" class="action action-warning" type="button" disabled aria-pressed="false"><span aria-hidden="true">!</span><span><strong>Помощь при движении</strong><small>Экспериментальный режим</small></span></button></section>
 <section id="settingsPanel" class="settings" aria-labelledby="settingsTitle" hidden><h2 id="settingsTitle">Настройки</h2>
 <label class="switch-row"><span><strong>Озвучивание</strong><small>Системный голос устройства</small></span><input id="speechEnabled" type="checkbox" checked></label>
@@ -15,5 +17,13 @@
 <label>Анализов в секунду <output id="frequencyValue">1</output><input id="analysisFrequency" type="range" min="0.5" max="3" step="0.5" value="1"></label>
 <label>Чувствительность <output id="sensitivityValue">60%</output><input id="sensitivity" type="range" min="30" max="90" step="5" value="60"></label>
 <label>Повтор сообщений <select id="cooldown"><option value="5">через 5 секунд</option><option value="10" selected>через 10 секунд</option><option value="20">через 20 секунд</option><option value="30">через 30 секунд</option></select></label>
+<label class="switch-row"><span><strong>Автоматическое описание</strong><small>Полная сцена через Vision AI</small></span><input id="automaticDescription" type="checkbox" checked></label>
+<label>Частота AI-описания <select id="aiInterval"><option value="2">каждые 2 секунды</option><option value="3" selected>каждые 3 секунды</option><option value="5">каждые 5 секунд</option><option value="10">каждые 10 секунд</option></select></label>
+<label>Подробность <select id="detailLevel"><option value="short">Коротко</option><option value="normal" selected>Обычно</option><option value="detailed">Подробно</option></select></label>
+<label class="switch-row"><span><strong>Локальное распознавание</strong><small>Быстрые объекты, работает offline</small></span><input id="localDetectionEnabled" type="checkbox" checked></label>
+<label class="switch-row"><span><strong>AI-анализ</strong><small>Полное описание, нужен интернет</small></span><input id="aiAnalysisEnabled" type="checkbox" checked></label>
+<label>Системный голос <select id="voiceSelect"><option value="">Автоматически — русский</option></select></label>
 <label class="switch-row"><span><strong>Вибрация</strong><small>Сигналы новых объектов</small></span><input id="hapticsEnabled" type="checkbox" checked></label><label>Язык <select id="language"><option value="ru-RU">Русский</option><option disabled>Қазақша — скоро</option><option disabled>English — soon</option></select></label><button id="repeatButton" class="secondary-button" type="button">Повторить последнее сообщение</button></section>
-<details class="privacy"><summary>Приватность и ограничения</summary><p>Видео не записывается и не отправляется на сервер. Кадры обрабатываются в памяти. Расстояние оценивается словами только по размеру объекта — это не измерение глубины. Модель и OCR-язык требуют первой загрузки из интернета, затем браузер может использовать кэш.</p></details></main><script type="module" src="/src/bootstrap.js"></script></body></html>
+<label class="switch-row debug-toggle"><span><strong>Debug режим</strong><small>Технические данные AI</small></span><input id="debugEnabled" type="checkbox"></label>
+<section id="debugPanel" class="debug-panel" aria-label="Отладочная информация" hidden><h2>Debug</h2><pre id="debugOutput">Ожидание анализа</pre></section>
+<details class="privacy"><summary>Приватность и ограничения</summary><p>Видео не записывается. Локальное распознавание выполняется в браузере. Когда AI-анализ включён, отдельный уменьшенный JPEG-кадр отправляется через защищённый proxy выбранному Vision provider и не сохраняется приложением. Отключите AI-анализ для полностью локального режима. Расстояние по обычной камере не измеряется.</p></details></main><script type="module" src="/src/bootstrap.js"></script></body></html>

@@ -1,20 +1,16 @@
 services:
   - type: web
     name: qraft-vision
-    runtime: static
+    runtime: node
+    plan: free
     buildCommand: npm ci && npm run build
-    staticPublishPath: ./dist
-    headers:
-      - path: /*
-        name: Permissions-Policy
-        value: camera=(self), microphone=()
-      - path: /*
-        name: X-Content-Type-Options
-        value: nosniff
-    routes:
-      - type: rewrite
-        source: /
-        destination: /index.html
-      - type: rewrite
-        source: /*
-        destination: /index.html
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_VERSION
+        value: 24.16.0
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: PUBLIC_APP_URL
+        value: https://qraft-vision.onrender.com
